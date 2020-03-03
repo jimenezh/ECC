@@ -20,6 +20,7 @@ def brute_force(prime, generator, number):
     
         if exp_gen % prime == number_mod_prime: # checking if equal
             return x # returning x if equal
+        
         x += 1 # otherwise we try the next biggest value for x
 
 def collision_alg(prime, generator, number):
@@ -38,65 +39,45 @@ def collision_alg(prime, generator, number):
     order = prime-1
     # find n
     n = 1 + floor(  order ** 0.5 )
-    print('\n\n\nSolving', generator, '^ x =', number, 'mod', prime)
-    # print('order is', order, 'so', generator,'^', order, 'is', generator ** order % prime)
-    # print('n is', n, 'as floor', order**0.5)
+
     # find inverse of gen
     g_inv = find_inv(generator, prime)
-    # print('\ninverse', g_inv, 'so', generator, '*', g_inv, 'is', generator*g_inv % prime)
 
-    # initialize two lists
+    # initialize dictionary
     gen_list = {}
-    num_list = []
-    
-    # print('\ntaking gen', generator, 'and gen_inv', g_inv,'\n')
 
+    # initializing runner vals
     curr_gen = 1
     curr_g_inv = 1
-    l = []
+
     # exponentiations of generator 
     for i in range(n+1):
         index = (curr_gen ) % prime # index is the generator exponentiation
         gen_list[index] = i # this index is part of the answer
         curr_gen = index* generator
-        l.append(index)
-    print('exponentiations', gen_list, l)
-    # num times exponentiations of gen_inv
 
     for i in range(n+1):
         cand =  (number * curr_g_inv) % prime
-        print(number, '*', curr_g_inv % prime, pow(g_inv, i, prime),'=', cand)
-        # print('possible collision is with', cand)
-        num_list.append(cand)
         if cand in gen_list: # checking for collision
-            print(cand, 'in dict at index', i, 'with', gen_list[cand], 'is', gen_list[cand]+i)
-            # we know gen_list[cand] holds part of the answer
-            print('generator', generator, '^', gen_list[cand]+i, 'is',
-                generator **(gen_list[cand]+i) % prime, '=?', number)
-            return gen_list[cand]+i
+            return gen_list[cand]+i # answer is sum of exponents
         curr_g_inv = (curr_g_inv * g_inv) % prime
 
-    print('lists are:', l, num_list)
-
     
-
-def find_order(n, p):
-    i = 1
-    while True:
-        # print(n, i, (n ** i) % p)
-        if (n ** i) % p == 1:
-            return i
-        i += 1
 def find_inv(g, p):
     # print('here')
     return pow(g, p-2, p)
 
-# print(find_order(2, 11))
-# print(find_inv(3, 7))
 
-generator = 3
-prime = 11
-num =4
-# print('\nthe answer to the problem', generator, ' ** x = ', num, 'mod', prime, 
-#     ' is', brute_force(prime, generator, num))
-collision_alg(prime, generator, num)
+def main():
+    prime = int(input('Pick a prime: '))
+    generator = int(input('Pick a generator: '))
+    num = int(input('Pick an arbitrary number: '))
+    a0 = collision_alg(prime, generator, num)
+    a1 = brute_force(prime, generator, num)
+
+    print('\n\n\nSolving', generator, '^ x =', num, 'mod', prime)
+    print('Answer using brute force', a1, '\nAnswer using collision', a0)
+
+    print('Checking:', pow(generator, a0, prime) == num,pow(generator, a1, prime) == num)
+
+main()
